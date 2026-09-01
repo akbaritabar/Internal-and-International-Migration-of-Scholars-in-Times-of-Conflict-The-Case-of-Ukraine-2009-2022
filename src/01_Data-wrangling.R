@@ -21,9 +21,6 @@ library(geojsonsf)
 library(patchwork)
 
 #### Resolve input/output directories ####
-# Works both standalone (falls back to the project root via `here`, found
-# from this repo's .git marker) and inside Docker (DATA_DIR/OUTPUT_DIR are
-# set by the Dockerfile). See Errors_found.md.
 data_dir <- Sys.getenv("DATA_DIR", unset = NA)
 if (is.na(data_dir) || !nzchar(data_dir)) data_dir <- here::here("data")
 output_dir <- Sys.getenv("OUTPUT_DIR", unset = NA)
@@ -794,12 +791,6 @@ ukr_oa_2009.2020 <- ukr_oa_2009.2020 %>%
 # Define a function to save plots
 save_plot <- function(plot, filename, scale = 1, width = 12.28, height = 10,
                       dpi = 300, units = "cm", limitsize = FALSE) {
-  # device was hardcoded to cairo_pdf regardless of `filename`'s extension,
-  # so a "*.svg" call silently wrote PDF bytes into a .svg-named file (see
-  # Errors_found.md). NULL lets ggsave() pick the device from the filename
-  # extension instead; .pdf calls still get cairo_pdf explicitly, since its
-  # fontconfig-based text rendering is what makes the Times New Roman
-  # theme() calls elsewhere in this codebase work at all.
   dev <- if (grepl("\\.svg$", filename, ignore.case = TRUE)) NULL else cairo_pdf
   ggsave(filename = filename, plot = plot, scale = scale,
          width = width, height = height, units = units,

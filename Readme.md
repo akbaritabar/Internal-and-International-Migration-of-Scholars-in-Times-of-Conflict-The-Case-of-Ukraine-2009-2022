@@ -66,9 +66,6 @@ Then, follow the order below and execute R scripts to replicate the figures and 
   "Appendix_Fig2.R",       # depends on 03_Fig2.R state
   "Appendix_T1.R",         # Spearman correlation table, unlagged
   "Appendix_T2.R",         # Spearman correlation table, OA lagged 2y
-  "spearman_corr_oa-sc_lag2.R", # duplicate of Appendix_T2.R's computation; writes
-                            #   the same .tex path again (harmless, same content) --
-                            #   see Errors_found.md
   "Appendix_T3.R",         # texreg tables, internal migration models
   "Appendix_T5.R"          # texreg tables, international migration models
 
@@ -77,7 +74,7 @@ Then, follow the order below and execute R scripts to replicate the figures and 
 ## Repository layout
 
 ```
-src/          15 analysis scripts
+src/          14 analysis scripts
 data/         input files
 output/       everything the pipeline produces
 install_packages.R   To install required packages

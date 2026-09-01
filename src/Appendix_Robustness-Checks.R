@@ -4,10 +4,7 @@
 
 #### Code same as 01_Data-wrangling.R but with the correct one-year backfill dataset ####
 
-# Run after: nothing -- self-contained (own data load, own model specs); run
-# in a fresh/cleared R session so it isn't contaminated by the main pipeline's
-# objects (see run_pipeline.R).
-
+# Run after: nothing -- self-contained (own data load, own model specs);
 #### Load libraries ####
 
 library(ggplot2)
@@ -25,9 +22,6 @@ library(geojsonsf)
 library(patchwork)
 
 #### Resolve input/output directories ####
-# Works both standalone (falls back to the project root via `here`, found
-# from this repo's .git marker) and inside Docker (DATA_DIR/OUTPUT_DIR are
-# set by the Dockerfile). See Errors_found.md.
 data_dir <- Sys.getenv("DATA_DIR", unset = NA)
 if (is.na(data_dir) || !nzchar(data_dir)) data_dir <- here::here("data")
 output_dir <- Sys.getenv("OUTPUT_DIR", unset = NA)
