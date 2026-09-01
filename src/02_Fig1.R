@@ -103,10 +103,7 @@ gdl_colors <- gdl_colors[desired_order]
 ## Figure 1: population of scholars by GDL macro-region (OpenAlex) ##
 
 # A 4-region + total variant of this figure (cardinal_area2, with an
-# "Eastern Ukraine + Crimea" category) used to live here, built from
-# centrukrpop_oa/westukrpop_oa/southukrpop_oa/eastcrimukrpop_oa. Those
-# objects were never defined anywhere in this codebase and cardinal_area2
-# is otherwise unused, so the block was removed -- see Errors_found.md.
+# "Eastern Ukraine + Crimea" category)
 
 # Combine GDL data for OpenAlex only
 gdl_pops_oa_combined <- bind_rows(totalpop_oa %>% mutate(gdl_area = "Ukraine (total)"), 
