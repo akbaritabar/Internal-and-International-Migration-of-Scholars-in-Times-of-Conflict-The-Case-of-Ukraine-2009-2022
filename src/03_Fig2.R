@@ -20,7 +20,7 @@ bin_nmr_rate <- function(data, variable, new_var_name) {
   data[[new_var_name]] <- cut(
     data[[variable]],
     breaks = c(-1000, -50, -10, -0.00000001, 0, 10, 50, 1000),
-    labels = c("< -100", "[-100, -10)", "[-10, 0)", "0", "[0, 10)", "(10, 100]", "> 100")
+    labels = c("< -50", "[-50, -10)", "[-10, 0)", "0", "[0, 10)", "(10, 50]", "> 50")
   )
   return(data)
 }
@@ -191,7 +191,7 @@ macro_region_colors <- c(
 )
 
 # Name the migration rate palette to match factor levels
-migration_rate_names <- c("< -100", "[-100, -10)", "[-10, 0)", "0", "[0, 10)", "(10, 100]", "> 100")
+migration_rate_names <- c("< -50", "[-50, -10)", "[-10, 0)", "0", "[0, 10)", "(10, 50]", "> 50")
 names(pal_7cat_div) <- migration_rate_names
 
 # Combine palettes
@@ -302,10 +302,10 @@ reference_map_regions <- merged_data3_oa_complete %>%
   geom_sf(aes(geometry = geometry), fill = "lightgray", color = "black") +
   ggrepel::geom_label_repel(
     aes(x = lon, y = lat, label = name2), 
-    size = 6 / .pt,            # 6pt labels
+    size = 5 / .pt,            # 6pt labels
     family = "Times New Roman",
-    box.padding = 0.35,
-    point.padding = 0.3,
+    box.padding = 0.2,
+    point.padding = 0.1,
     force = 2,
     max.overlaps = Inf,
     min.segment.length = 0,
@@ -338,11 +338,11 @@ reference_map_macro <- ggplot(reference_data_macro) +
   ggrepel::geom_label_repel(
     data = macro_region_centroids,
     aes(x = lon, y = lat, label = macro_region), 
-    size = 6 / .pt,            # 6pt labels
+    size = 5 / .pt,            # 6pt labels
     family = "Times New Roman",
     fontface = "bold",
-    box.padding = 0.5,
-    point.padding = 0.3,
+    box.padding = 0.4,
+    point.padding = 0.2,
     force = 1.5,
     max.overlaps = Inf,
     min.segment.length = 0,
@@ -389,9 +389,10 @@ main_map <- ggplot(merged_data_oa_combined) +
 combined_nmr_map_oa <- ggarrange(
   main_map,
   ggarrange(reference_map_regions, reference_map_macro, 
-            ncol = 1, heights = c(1, 1)),
+            ncol = 1, 
+            heights = c(1, 1)),   # equal split between the two reference maps
   ncol = 2,
-  widths = c(1.2, 1.2)
+  widths = c(2, 1.5)   # give reference maps more horizontal space than before
 )
 
 # Add overall title
@@ -404,5 +405,6 @@ combined_nmr_map_oa <- annotate_figure(
 print(combined_nmr_map_oa)
 
 save_plot(combined_nmr_map_oa,
-          write_path("updated-data/twoyearbackfill/fig2_spatialview_openalex.svg"),
-          width = 12, height = 8)
+          write_path("updated-data/twoyearbackfill/fig2_spatialview_openalex_fixed3.svg"),
+          width = 18,
+          height = 16)

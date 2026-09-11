@@ -17,7 +17,6 @@ write_path <- function(...) {
 
 # Updated mapping function for Internal migration (region labels)
 create_nmrmigration_map_IN <- function(data, fill_var, facet_var, title_text) {
-  # Prepare label data outside the plot
   label_data <- data %>% 
     filter(dataset == "Scopus" & year_group %in% openalex_only_years) %>%
     mutate(centroid = st_centroid(geometry)) %>%
@@ -27,39 +26,38 @@ create_nmrmigration_map_IN <- function(data, fill_var, facet_var, title_text) {
   
   ggplot(data) +
     geom_sf(aes(geometry = geometry, fill = !!rlang::sym(fill_var))) +
-    ggrepel::geom_text_repel(
+    ggrepel::geom_label_repel(    # switched from geom_text_repel
       data = label_data,
       aes(x = lon, y = lat, label = name2), 
-      size = 6 / .pt,          # 6pt labels (convert to ggplot units)
+      size = 2 / .pt,
       family = "Times New Roman",
-      box.padding = 0.3,
-      point.padding = 0.3,
-      force = 2,
-      force_pull = 2,
+      box.padding = 0.1,
+      point.padding = 0.1,
+      force = 1,
+      force_pull = 3,
       max.overlaps = Inf,
-      min.segment.length = 0,
-      segment.size = 0.3,
-      segment.color = "gray50"
+      min.segment.length = 0,     # restore segments
+      segment.size = 0.2,
+      segment.color = "gray50",
+      fill = "white",             # white label background
+      label.size = 0.1,           # thin border around label box
+      label.padding = unit(0.1, "lines")  # tight padding inside box
     ) +
     facet_grid(as.formula(paste("year_group ~ dataset"))) +
     scale_fill_manual(values = pal_7cat_div, na.value = '#d7d7d2', drop = FALSE) +
     theme_void() +
     labs(title = title_text, fill = "Net Migration Rate") +
     theme(
-      # Title: 9pt Times New Roman, 10pt leading
       plot.title = element_text(
         family = "Times New Roman", size = 9, face = "bold",
         hjust = 0.5, lineheight = 10/9
       ),
-      # Facet strip labels: axes category (8pt)
       strip.text = element_text(
         family = "Times New Roman", size = 8, lineheight = 9/8
       ),
-      # Legend title: axes category (8pt)
       legend.title = element_text(
         family = "Times New Roman", size = 8, lineheight = 9/8
       ),
-      # Legend text: labels category (6pt)
       legend.text = element_text(
         family = "Times New Roman", size = 6, lineheight = 7/6
       ),
@@ -67,9 +65,7 @@ create_nmrmigration_map_IN <- function(data, fill_var, facet_var, title_text) {
     )
 }
 
-# Updated mapping function for International migration (macro-region labels)
 create_nmrmigration_map_INT <- function(data, fill_var, facet_var, title_text) {
-  # Prepare macro-region label data
   macro_labels_data <- macro_region_labels %>%
     mutate(lon = st_coordinates(centroid)[,1],
            lat = st_coordinates(centroid)[,2]) %>%
@@ -77,36 +73,39 @@ create_nmrmigration_map_INT <- function(data, fill_var, facet_var, title_text) {
   
   ggplot(data) +
     geom_sf(aes(geometry = geometry, fill = !!rlang::sym(fill_var))) +
-    ggrepel::geom_text_repel(
+    ggrepel::geom_label_repel(    # switched from geom_text_repel
       data = macro_labels_data,
       aes(x = lon, y = lat, label = name), 
-      size = 6 / .pt,          # 6pt labels (convert to ggplot units)
+      size = 3 / .pt,
       family = "Times New Roman",
       fontface = "bold",
-      box.padding = 0.3,
-      point.padding = 0.3,
-      force = 2,
-      max.overlaps = Inf
+      box.padding = 0.1,
+      point.padding = 0.1,
+      force = 0.5,
+      force_pull = 3,
+      max.overlaps = Inf,
+      min.segment.length = 0,     # restore segments
+      segment.size = 0.2,
+      segment.color = "gray50",
+      fill = "white",             # white label background
+      label.size = 0.1,           # thin border around label box
+      label.padding = unit(0.1, "lines")  # tight padding inside box
     ) +
     facet_grid(as.formula(paste("year_group ~ dataset"))) +
     scale_fill_manual(values = combined_palette, na.value = '#d7d7d2', drop = FALSE) +
     theme_void() +
     labs(title = title_text, fill = "Net Migration Rate") +
     theme(
-      # Title: 9pt Times New Roman, 10pt leading
       plot.title = element_text(
         family = "Times New Roman", size = 9, face = "bold",
         hjust = 0.5, lineheight = 10/9
       ),
-      # Facet strip labels: axes category (8pt)
       strip.text = element_text(
         family = "Times New Roman", size = 8, lineheight = 9/8
       ),
-      # Legend title: axes category (8pt)
       legend.title = element_text(
         family = "Times New Roman", size = 8, lineheight = 9/8
       ),
-      # Legend text: labels category (6pt)
       legend.text = element_text(
         family = "Times New Roman", size = 6, lineheight = 7/6
       ),
@@ -114,21 +113,31 @@ create_nmrmigration_map_INT <- function(data, fill_var, facet_var, title_text) {
     )
 }
 
-nmrmig_IN_by3_scoa <- create_nmrmigration_map_IN(merged_data_IN_by3_with_ref %>% filter(!is.na(year_group)), 
-                                                 "s_nmr_IN_binned", "year_group ~ dataset", 
-                                                 "Internal netmigration rates across Ukraine regions, \n selected years")
+nmrmig_IN_by3_scoa <- create_nmrmigration_map_IN(
+  merged_data_IN_by3_with_ref %>% filter(!is.na(year_group)), 
+  "s_nmr_IN_binned", "year_group ~ dataset", 
+  "Internal netmigration rates across Ukraine regions, \n selected years"
+)
 
-nmrmig_INT_by3_scoa <- create_nmrmigration_map_INT(merged_data_INT_by3_with_ref %>% filter(!is.na(year_group)), "s_nmr_INT_binned", "year_group ~ dataset", 
-                                                   "International netmigration rates across Ukraine regions, \n selected years")
+nmrmig_INT_by3_scoa <- create_nmrmigration_map_INT(
+  merged_data_INT_by3_with_ref %>% filter(!is.na(year_group)), 
+  "s_nmr_INT_binned", "year_group ~ dataset", 
+  "International netmigration rates across Ukraine regions, \n selected years"
+)
 
-# Combine maps with shared legend
-combined_nmr_map <- ggarrange(nmrmig_IN_by3_scoa, 
-                              nmrmig_INT_by3_scoa, 
-                              common.legend = TRUE,
-                              legend = "bottom")
+combined_nmr_map <- ggarrange(
+  nmrmig_IN_by3_scoa, 
+  nmrmig_INT_by3_scoa, 
+  common.legend = TRUE,
+  legend = "bottom"
+)
 
 print(combined_nmr_map)
 
 save_plot(combined_nmr_map,
-          write_path("updated-data/twoyearbackfill/fig2_spatialview_scoa_updated.svg"),
-          width = 12, height = 8)
+          write_path("updated-data/twoyearbackfill/fig2_spatialview_scoa_updated.pdf"),
+          width = 18, height = 16)
+
+save_plot(combined_nmr_map,
+          write_path("updated-data/twoyearbackfill/fig2_spatialview_scoa_updated.pdf"),
+          width = 18, height = 16)
